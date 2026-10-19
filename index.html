@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konversi Nilai Remedial Sistematis</title>
+    <style>
+        :root {
+            --primary-color: #2b6cb0;
+            --accent-color: #3182ce;
+            --hover-accent: #2c5282;
+            --danger-color: #e53e3e;
+            --bg-color: #edf2f7;
+            --card-bg: #ffffff;
+            --text-color: #2d3748;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 600px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+        input[type="number"], textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
+        }
+        textarea {
+            resize: vertical;
+            font-family: monospace;
+            background-color: #f7fafc;
+        }
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn:hover {
+            background-color: var(--hover-accent);
+        }
+        .btn-outline {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+        .btn-outline:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .btn-block {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            margin-top: 15px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #ebf8ff;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        tr:nth-child(even) {
+            background-color: #f7fafc;
+        }
+        .text-center {
+            text-align: center;
+        }
+		
+		/* Footer Kredit */
+        .app-footer {
+            text-align: center;
+            margin-top: 35px;
+            padding-top: 20px;
+            border-top: 1px solid #cbd5e0;
+            color: #718096;
+            font-size: 14px;
+        }
+        .app-footer strong {
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        /* --- TAMBAHAN CSS UNTUK POP-UP (MODAL) --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin: 0;
+        }
+        .alert-modal-content {
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #a0aec0;
+            border: none;
+            background: transparent;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+        .alert-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+        .alert-message {
+            font-size: 16px;
+            margin-bottom: 25px;
+            color: var(--text-color);
+        }
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>KONVERSI NILAI REMEDIAL SISTEMATIS</h1>
+
+        <div class="card">
+            <h2>1. Pengaturan Nilai</h2>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="targetMin">Nilai Minimum:</label>
+                    <input type="number" id="targetMin" placeholder="Contoh: 75" value="75" required>
+                </div>
+                <div class="form-group">
+                    <label for="targetMax">Nilai Maksimum:</label>
+                    <input type="number" id="targetMax" placeholder="Contoh: 100" value="100" required>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>2. Input Data</h2>
+            <p style="font-size: 13px; color: #718096; margin-bottom: 15px;">
+                Catatan:<br>
+				- Ketik/tempel daftar nama pada kolom kiri, dan daftar nilai pada kolom kanan.<br>
+				- Pastikan baris nama dan nilai sejajar.<br>
+				- Kolom nama bersifat opsional, boleh dibiarkan kosong.
+            </p>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="inputNames">Nama Siswa (Opsional):</label>
+                    <textarea id="inputNames" rows="7" placeholder="Adi Nugroho&#10;Budi Santoso&#10;Citra Lestari"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="inputScores">Nilai Awal (Wajib):</label>
+                    <textarea id="inputScores" rows="7" placeholder="65&#10;40&#10;25"></textarea>
+                </div>
+            </div>
+            <button class="btn btn-block" onclick="hitungKatrol()">Konversi Nilai</button>
+		</div>
+		
+		<div class="app-footer">
+            Dibuat oleh: <br><strong>Dede Ardi Hikmatulloh, S.Th.I</strong><br>© 2025 – Portal PAI Dasar
+        </div>
+    </div>
+
+    <!-- POP-UP HASIL NILAI AKHIR -->
+<div id="resultOverlay" class="modal-overlay">
+    <div class="modal-content" id="resultSection">
+        <button class="modal-close" onclick="closeResultModal()">&times;</button>
+        <h2>3. Hasil Nilai Akhir</h2>
+        
+        <div class="btn-group">
+            <button class="btn btn-outline" onclick="salinSemua()">📋 Salin Nama & Nilai</button>
+            <button class="btn btn-outline" onclick="salinHanyaNilai()">📋 Salin Nilai (Akhir)</button>
+            <!-- TAMBAHAN: Tombol Salin Nilai Pembulatan -->
+            <button class="btn btn-outline" onclick="salinNilaiPembulatan()">📋 Salin Nilai (Bulat)</button>
+            <button class="btn btn-outline" style="border-color: var(--danger-color); color: var(--danger-color);" onclick="resetAplikasi()">🗑️ Hapus Data</button>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table id="resultTable">
+                <thead>
+                    <tr>
+                        <th class="text-center" style="width: 50px;">No.</th>
+                        <th>Nama Lengkap Siswa</th>
+                        <th class="text-center" style="width: 100px;">Nilai Awal</th>
+                        <th class="text-center" style="width: 120px;">Nilai Akhir</th>
+                        <!-- TAMBAHAN: Header Kolom Baru -->
+                        <th class="text-center" style="width: 140px;">Nilai Bulat</th>
+                    </tr>
+                </thead>
+                <tbody id="resultBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+    <!-- POP-UP CUSTOM ALERT / PEMBERITAHUAN -->
+    <div id="alertOverlay" class="modal-overlay">
+        <div class="alert-modal-content">
+            <div id="alertIcon" class="alert-icon">⚠️</div>
+            <div id="alertMessage" class="alert-message">Pesan di sini</div>
+            <div class="btn-group" style="justify-content: center; margin-bottom: 0;" id="alertActions">
+                <button class="btn" onclick="closeAlert()">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let globalHasilData = [];
+
+        /* --- FUNGSI KONTROL POP-UP (MODAL) --- */
+        function showCustomAlert(msg, type = "info") {
+            const overlay = document.getElementById('alertOverlay');
+            const msgEl = document.getElementById('alertMessage');
+            const iconEl = document.getElementById('alertIcon');
+            const actionsEl = document.getElementById('alertActions');
+            
+            msgEl.innerHTML = msg;
+            actionsEl.innerHTML = `<button class="btn" onclick="closeAlert()">Tutup</button>`;
+            
+            if (type === "success") iconEl.innerHTML = "✅";
+            else if (type === "error") iconEl.innerHTML = "❌";
+            else if (type === "warning") iconEl.innerHTML = "⚠️";
+            else iconEl.innerHTML = "ℹ️";
+            
+            overlay.style.display = "flex";
+        }
+
+        function showCustomConfirm(msg, onConfirm) {
+            const overlay = document.getElementById('alertOverlay');
+            const msgEl = document.getElementById('alertMessage');
+            const iconEl = document.getElementById('alertIcon');
+            const actionsEl = document.getElementById('alertActions');
+            
+            msgEl.innerHTML = msg;
+            iconEl.innerHTML = "❓";
+            
+            actionsEl.innerHTML = `
+                <button class="btn btn-outline" onclick="closeAlert()">Batal</button>
+                <button class="btn" style="background-color: var(--danger-color); border: none;" id="confirmBtn">Hapus</button>
+            `;
+            
+            document.getElementById('confirmBtn').onclick = () => {
+                closeAlert();
+                if(onConfirm) onConfirm();
+            };
+            
+            overlay.style.display = "flex";
+        }
+        
+        function closeAlert() {
+            document.getElementById('alertOverlay').style.display = "none";
+        }
+
+        function closeResultModal() {
+            document.getElementById('resultOverlay').style.display = "none";
+        }
+        /* ------------------------------------- */
+
+        function hitungKatrol() {
+            const targetMin = parseFloat(document.getElementById('targetMin').value);
+            const targetMax = parseFloat(document.getElementById('targetMax').value);
+            
+            const textNames = document.getElementById('inputNames').value.trim();
+            const textScores = document.getElementById('inputScores').value.trim();
+
+            if (isNaN(targetMin) || isNaN(targetMax) || targetMin >= targetMax) {
+                showCustomAlert("Harap periksa kembali nilai minimum dan nilai maksimum!", "error");
+                return;
+            }
+            if (!textScores) {
+                showCustomAlert("Kolom nilai masih kosong, silakan isi terlebih dahulu.", "warning");
+                return;
+            }
+
+            // Memecah baris menjadi array
+            const linesName = textNames.split('\n');
+            const linesScore = textScores.split('\n');
+            const totalLines = Math.max(linesName.length, linesScore.length);
+
+            let dataSiswa = [];
+            let nilaiAsliMin = Infinity;
+            let nilaiAsliMax = -Infinity;
+
+            // Proses pencocokan nama dan nilai baris demi baris
+            for (let i = 0; i < totalLines; i++) {
+                let rawScore = (linesScore[i] || "").trim().replace(',', '.'); // ganti koma desimal jadi titik
+                
+                if (rawScore === "") continue; // Jika tidak ada angka di baris ini, lewati
+
+                let nilaiAsli = parseFloat(rawScore);
+                if (!isNaN(nilaiAsli)) {
+                    let nama = (linesName[i] || "").trim();
+                    if (nama === "") nama = "Siswa " + (i + 1); // Jika nama kosong di baris ini
+                    
+                    dataSiswa.push({ nama: nama, nilaiAsli: nilaiAsli });
+                    
+                    if (nilaiAsli < nilaiAsliMin) nilaiAsliMin = nilaiAsli;
+                    if (nilaiAsli > nilaiAsliMax) nilaiAsliMax = nilaiAsli;
+                }
+            }
+
+            if (dataSiswa.length === 0) {
+                showCustomAlert("Tidak ada data valid yang ditemukan di kolom nilai.", "error");
+                return;
+            }
+
+            const semuaNilaiSama = (nilaiAsliMin === nilaiAsliMax);
+
+            // Hitung Katrol
+globalHasilData = dataSiswa.map((siswa) => {
+    let nilaiKatrol = semuaNilaiSama 
+        ? targetMax 
+        : targetMin + ((siswa.nilaiAsli - nilaiAsliMin) * (targetMax - targetMin)) / (nilaiAsliMax - nilaiAsliMin);
+    
+    // Pembulatan ke 2 desimal (Nilai Akhir Presisi)
+    nilaiKatrol = Math.round(nilaiKatrol * 100) / 100;
+    
+    // TAMBAHAN: Pembulatan ke bilangan bulat utuh
+    let nilaiBulat = Math.round(nilaiKatrol);
+    
+    return {
+        nama: siswa.nama,
+        nilaiAsli: siswa.nilaiAsli,
+        nilaiKatrol: nilaiKatrol,
+        nilaiBulat: nilaiBulat // Disimpan di objek
+    };
+});
+
+// Render Tabel HTML
+const resultBody = document.getElementById('resultBody');
+resultBody.innerHTML = "";
+
+globalHasilData.forEach((item, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td class="text-center">${index + 1}</td>
+        <td>${item.nama}</td>
+        <td class="text-center">${item.nilaiAsli}</td>
+        <td class="text-center">${item.nilaiKatrol}</td>
+        <td class="text-center" style="font-weight: bold; color: var(--primary-color);">${item.nilaiBulat}</td>
+    `;
+    resultBody.appendChild(tr);
+});
+
+            // Tampilkan Pop-up Hasil Nilai
+            document.getElementById('resultOverlay').style.display = 'flex';
+        }
+
+        // Fungsi menyalin Nama, Nilai Akhir, & Nilai Pembulatan secara bersamaan (dengan Tab)
+function salinSemua() {
+    if (globalHasilData.length === 0) return;
+    let teksSalin = "";
+    globalHasilData.forEach(item => {
+        // Konversi titik ke koma agar sesuai standar Excel Indonesia
+        let nilaiExcel = item.nilaiKatrol.toString().replace('.', ',');
+        
+        // Menambahkan \t (tab) sebelum item.nilaiBulat
+        teksSalin += `${item.nama}\t${nilaiExcel}\t${item.nilaiBulat}\n`;
+    });
+
+    navigator.clipboard.writeText(teksSalin).then(() => {
+        showCustomAlert("Nama dan nilai berhasil disalin!", "success");
+    }).catch(() => showCustomAlert("Gagal menyalin.", "error"));
+}
+
+        // Fungsi menyalin HANYA Nilainya saja
+        function salinHanyaNilai() {
+            if (globalHasilData.length === 0) return;
+            let teksSalin = "";
+            globalHasilData.forEach(item => {
+                let nilaiExcel = item.nilaiKatrol.toString().replace('.', ',');
+                teksSalin += `${nilaiExcel}\n`;
+            });
+
+            navigator.clipboard.writeText(teksSalin).then(() => {
+                showCustomAlert("Nilai akhir berhasil disalin!", "success");
+            }).catch(() => showCustomAlert("Gagal menyalin.", "error"));
+        }
+		
+		// Fungsi menyalin HANYA Nilai Pembulatan
+function salinNilaiPembulatan() {
+    if (globalHasilData.length === 0) return;
+    let teksSalin = "";
+    globalHasilData.forEach(item => {
+        teksSalin += `${item.nilaiBulat}\n`;
+    });
+
+    navigator.clipboard.writeText(teksSalin).then(() => {
+        showCustomAlert("Nilai pembulatan berhasil disalin!", "success");
+    }).catch(() => showCustomAlert("Gagal menyalin.", "error"));
+}
+		
+		// Fungsi untuk mereset seluruh aplikasi
+        function resetAplikasi() {
+            // Meminta konfirmasi dengan pop-up custom
+            showCustomConfirm("Yakin ingin menghapus semua data dan memulai proses konversi dari awal?", () => {
+                // 1. Kosongkan kotak input teks
+                document.getElementById('inputNames').value = '';
+                document.getElementById('inputScores').value = '';
+                
+                // 2. Kosongkan tabel hasil dan array data global
+                document.getElementById('resultBody').innerHTML = '';
+                globalHasilData = [];
+                
+                // 3. Sembunyikan kembali bagian hasil (tutup pop-up)
+                closeResultModal();
+                
+                // 4. (Opsional) Mengembalikan target ke nilai awal
+                document.getElementById('targetMin').value = '75';
+                document.getElementById('targetMax').value = '100';
+                
+                // 5. Scroll kembali ke atas
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Notifikasi sukses
+                setTimeout(() => showCustomAlert("Data berhasil dihapus!", "success"), 300);
+            });
+        }
+    </script>
+</body>
+</html>
